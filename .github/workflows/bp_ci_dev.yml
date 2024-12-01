@@ -162,10 +162,13 @@ jobs:
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_0D4FF4888D7448A49858E385EE5F1433 }}
           package: .
           
-  zap_test:
+
+  zap_baseline_scan:
+    env:
+    URI: https://bmi-ca1-ks-g7azhrfvf8gkg8a9.germanywestcentral-01.azurewebsites.net/ 
     runs-on: ubuntu-latest
-    needs: deploy  # Run only after deploy is successful
-    if: ${{ success() }}
+    needs: deploy  # Depend on deploy job
+    if: ${{ needs.deploy.result == 'success' }}  # Ensures running only after deploy is successful
     steps:
       - name: Pull Docker image for ZAP
         run: docker pull zaproxy/zap-weekly
@@ -181,8 +184,8 @@ jobs:
 
   k6_load_test:
     runs-on: ubuntu-latest
-    needs: deploy  # Run only after deploy is successful
-    if: ${{ success() }}
+    needs: deploy  # Depend on deploy job
+    if: ${{ needs.deploy.result == 'success' }}  # Ensures running only after deploy is successful
     steps:
       - uses: actions/checkout@v4
 
@@ -196,6 +199,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: k6report
-          path: k6report.txt     
+          path: k6report.txt  
 
 
