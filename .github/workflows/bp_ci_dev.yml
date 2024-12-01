@@ -112,7 +112,7 @@ jobs:
       - name: Depcheck
         uses: dependency-check/Dependency-Check_Action@main
         with:
-          project: ${{ inputs.project }}
+          project: 'BP-CA1-KS-Final-Dev'
           path: '.'
           format: 'HTML'
           args: '--failOnCVSS 8'
