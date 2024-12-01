@@ -103,7 +103,25 @@ jobs:
       #       text    = "❌ CI Pipeline failed on branch ${{ github.ref }}."
       #     }
       #     Invoke-RestMethod -Uri "https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMessage" -Method Post -Body $Body
+  dependency_check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
+      - name: Depcheck
+        uses: dependency-check/Dependency-Check_Action@main
+        with:
+          project: ${{ inputs.project }}
+          path: '.'
+          format: 'HTML'
+          args: '--failOnCVSS 8'
+
+      - name: Upload Test results
+        uses: actions/upload-artifact@v4
+        with:
+          name: Depcheck report
+          path: ${{ github.workspace }}/reports
   deploy:
     runs-on: windows-latest
     needs: build
