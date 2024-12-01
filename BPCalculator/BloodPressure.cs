@@ -1,16 +1,15 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
 
 namespace BPCalculator
 {
     // BP categories
     public enum BPCategory
     {
-        [Display(Name="Low Blood Pressure")] Low,
-        [Display(Name="Ideal Blood Pressure")]  Ideal,
-        [Display(Name="Pre-High Blood Pressure")] PreHigh,
-        [Display(Name ="High Blood Pressure")]  High
+        [Display(Name = "Low Blood Pressure")] Low,
+        [Display(Name = "Ideal Blood Pressure")] Ideal,
+        [Display(Name = "Pre-High Blood Pressure")] PreHigh,
+        [Display(Name = "High Blood Pressure")] High
     };
 
     public class BloodPressure
@@ -21,20 +20,39 @@ namespace BPCalculator
         public const int DiastolicMax = 100;
 
         [Range(SystolicMin, SystolicMax, ErrorMessage = "Invalid Systolic Value")]
-        public int Systolic { get; set; }                       // mmHG
+        public int Systolic { get; set; } // mmHG
 
         [Range(DiastolicMin, DiastolicMax, ErrorMessage = "Invalid Diastolic Value")]
-        public int Diastolic { get; set; }                      // mmHG
+        public int Diastolic { get; set; } // mmHG
 
-        // calculate BP category
+        // Calculate BP category
         public BPCategory Category
         {
             get
             {
-                // implement as part of project
-                //throw new NotImplementedException("not implemented yet");
-                return new BPCategory();                       // replace this
+                if (Systolic < 90 || Diastolic < 60)
+                    return BPCategory.Low;
+                else if (Systolic <= 120 && Diastolic <= 80)
+                    return BPCategory.Ideal;
+                else if (Systolic <= 139 || Diastolic <= 89)
+                    return BPCategory.PreHigh;
+                else
+                    return BPCategory.High;
             }
         }
+
+        // Calculate Mean Arterial Pressure (MAP)
+        //public double MeanArterialPressure
+        //{
+        //    get
+        //    {
+        //        double map = (Systolic + 2 * Diastolic) / 3.0;
+        //        if (map < 50 || map > 150)
+        //        {
+        //            throw new InvalidOperationException("Mean Arterial Pressure out of range.");
+        //        }
+        //        return map;
+        //    }
+        //}
     }
 }
