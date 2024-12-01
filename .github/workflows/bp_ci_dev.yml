@@ -161,26 +161,26 @@ jobs:
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_0D4FF4888D7448A49858E385EE5F1433 }}
           package: .
-      - name: zap_baseline_scan
-          if: success()      
+      - name: Send Telegram Success Message
+        if: success()      
 
-          env:
-            URI: https://bp-ca1-ks-final-dev-efbdh3a8hfgufufu.germanywestcentral-01.azurewebsites.net/ 
-          runs-on: ubuntu-latest
+        env:
+          URI: https://bp-ca1-ks-final-dev-efbdh3a8hfgufufu.germanywestcentral-01.azurewebsites.net/ 
+        runs-on: ubuntu-latest
 
-          steps:
+        steps:
 
-          - name: Pull Docker image for ZAP
-            run: docker pull zaproxy/zap-weekly
+        - name: Pull Docker image for ZAP
+          run: docker pull zaproxy/zap-weekly
 
-          - name: Run baseline scan
-            run: docker run -v /report:/zap/wrk/:rw --user root -t zaproxy/zap-weekly zap-baseline.py -t ${{env.URI}} -I -r zapreport.html
-        
-          - uses: actions/upload-artifact@v4
-            name: upload ZAP report
-            with:
-              name: ZAPreport
-              path: /report/zapreport.html
+        - name: Run baseline scan
+          run: docker run -v /report:/zap/wrk/:rw --user root -t zaproxy/zap-weekly zap-baseline.py -t ${{env.URI}} -I -r zapreport.html
+      
+        - uses: actions/upload-artifact@v4
+          name: upload ZAP report
+          with:
+            name: ZAPreport
+            path: /report/zapreport.html
 
   k6_load_test:
 
