@@ -1,0 +1,26 @@
+# Sonar cloud scan
+
+name: SonarCloud
+on:
+  workflow_dispatch:                             
+
+jobs:
+  scan_code:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  
+      - name: SonarCloud Scan
+        uses: sonarsource/sonarcloud-github-action@master
+        with:
+          projectBaseDir: .
+          args: >
+            -Dsonar.organization=gclynch
+            -Dsonar.projectKey=gclynch_bmi2021multijob
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+ 
+
+# secrets.SONAR_TOKEN secret in Github repo (generated when new project analysed on sonar cloud)
