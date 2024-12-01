@@ -161,6 +161,22 @@ jobs:
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_0D4FF4888D7448A49858E385EE5F1433 }}
           package: .
-       
+  k6_load_test:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Pull Docker image for k6
+      run: docker pull grafana/k6
+
+    - name: Run k6 load test, capture report
+      run: docker run -i grafana/k6 run - <k6tests/perf2.js > k6report.txt
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: k6report
+        path: k6report.txt       
 
 
