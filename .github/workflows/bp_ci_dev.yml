@@ -162,10 +162,10 @@ jobs:
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_0D4FF4888D7448A49858E385EE5F1433 }}
           package: .
           
-
-  zap_baseline_scan:
     env:
-    URI: https://bmi-ca1-ks-g7azhrfvf8gkg8a9.germanywestcentral-01.azurewebsites.net/ 
+    URI: https://bmi-ca1-ks-g7azhrfvf8gkg8a9.germanywestcentral-01.azurewebsites.net/
+  zap_baseline_scan:
+ 
     runs-on: ubuntu-latest
     needs: deploy  # Depend on deploy job
     if: ${{ needs.deploy.result == 'success' }}  # Ensures running only after deploy is successful
