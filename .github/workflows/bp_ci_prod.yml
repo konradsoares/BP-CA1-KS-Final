@@ -1,0 +1,130 @@
+name: BP_CA1_KS_FINAL_PROD
+
+env:
+  AZURE_WEBAPP_NAME: BP-CA1-KS-Final
+  AZURE_WEBAPP_PACKAGE_PATH: 'publish/myapp'
+
+on:
+  push:
+    branches:
+      - dev
+  workflow_dispatch:
+
+# jobs:
+#   build:
+#     runs-on: windows-latest
+
+#     steps:
+#     - uses: actions/checkout@v4
+    
+#     - name: Setup .NET
+#       uses: actions/setup-dotnet@v4
+#       with:
+#         dotnet-version: 8.0.x
+    
+#     - name: Build for Release
+#       run: dotnet build --configuration Release
+    
+#     - name: Run unit tests
+#       run: dotnet test BPCA1UnitTest/BPCA1UnitTest.csproj --no-restore --collect "Code coverage" -l:trx
+    
+#     - name: Upload Unit Test Results
+#       uses: actions/upload-artifact@v4
+#       with:
+#         name: TestResults
+#         path: '**/*.trx'
+    
+#     - name: Publish
+#       run: dotnet publish -c Release ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+
+      
+
+# # Deploy to Azure Web apps
+#     - name: Run Azure webapp deploy action using publish profile credentials
+#       uses: azure/webapps-deploy@v2
+#       with: 
+#         app-name: ${{ env.AZURE_WEBAPP_NAME }}                        # your app name
+#         publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_4B5A2FC226D949369E5A3C808336420F }} # Define secret variable in repository settings as per action documentation
+#         package: './${{ env.AZURE_WEBAPP_PACKAGE_PATH }}'
+
+# -----------------------------
+
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '8.x'
+          include-prerelease: true
+
+      - name: Build with dotnet
+        run: dotnet build --configuration Release
+
+      - name: Run unit tests
+        run: dotnet test BPCA1UnitTest/BPCA1UnitTest.csproj --no-restore --collect "Code coverage" -l:trx
+    
+      - name: Upload Unit Test Results
+        uses: actions/upload-artifact@v4
+        with:
+          name: TestResults
+          path: '**/*.trx'
+
+      - name: dotnet publish
+        run: dotnet publish -c Release -o ${{env.AZURE_WEBAPP_PACKAGE_PATH}}/myapp
+
+      - name: Upload artifact for deployment job
+        uses: actions/upload-artifact@v3
+        with:
+          name: .net-app
+          path: ${{env.AZURE_WEBAPP_PACKAGE_PATH}}/myapp
+
+
+      # - name: Send Telegram Success Message
+      #   if: success()
+      #   shell: pwsh
+      #   run: |
+      #     $Body = @{
+      #       chat_id = "${{ secrets.TELEGRAM_CHAT_ID }}"
+      #       text    = "✅ GitHub Actions succeeded on branch ${{ github.ref }}."
+      #     }
+      #     Invoke-RestMethod -Uri "https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMessage" -Method Post -Body $Body
+
+      # - name: Send Telegram Failure Message
+      #   if: failure()
+      #   run: |
+      #     $Body = @{
+      #       chat_id = "${{ secrets.TELEGRAM_CHAT_ID }}"
+      #       text    = "❌ CI Pipeline failed on branch ${{ github.ref }}."
+      #     }
+      #     Invoke-RestMethod -Uri "https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMessage" -Method Post -Body $Body
+
+  deploy:
+    runs-on: windows-latest
+    needs: build
+    environment:
+      name: 'Production'
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+
+    steps:
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v3
+        with:
+          name: .net-app
+
+      - name: Deploy to Azure Web App
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: 'bp-ca1-ks-final'
+          slot-name: 'Production'
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_C99F795B03464DDE85B545A1B65C13CA }}
+          package: .
+       
+
+
