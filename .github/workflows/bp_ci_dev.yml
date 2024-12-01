@@ -109,19 +109,21 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Depcheck
+      - name: Run OWASP Dependency Check
         uses: dependency-check/Dependency-Check_Action@main
         with:
-          project: 'BP-CA1-KS-Final-Dev'
+          project: 'BP-CA1-KS-Final'  # Ensure 'project' is specified
           path: '.'
           format: 'HTML'
+          out: 'reports'
           args: '--failOnCVSS 8'
 
-      - name: Upload Test results
+      - name: Upload Dependency Check Report
         uses: actions/upload-artifact@v4
         with:
-          name: Depcheck report
-          path: ${{ github.workspace }}/reports
+          name: Depcheck-report
+          path: reports
+          
   deploy:
     runs-on: windows-latest
     needs: build
