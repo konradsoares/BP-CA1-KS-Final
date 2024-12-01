@@ -161,43 +161,41 @@ jobs:
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_0D4FF4888D7448A49858E385EE5F1433 }}
           package: .
-      - name: Send Telegram Success Message
-        if: success()      
+          
+  zap_test:
+    runs-on: ubuntu-latest
+    needs: deploy  # Run only after deploy is successful
+    if: ${{ success() }}
+    steps:
+      - name: Pull Docker image for ZAP
+        run: docker pull zaproxy/zap-weekly
 
-        env:
-          URI: https://bp-ca1-ks-final-dev-efbdh3a8hfgufufu.germanywestcentral-01.azurewebsites.net/ 
-        runs-on: ubuntu-latest
+      - name: Run baseline scan
+        run: docker run -v ${{ github.workspace }}/report:/zap/wrk/:rw --user root -t zaproxy/zap-weekly zap-baseline.py -t ${{ env.URI }} -I -r zapreport.html
 
-        steps:
-
-        - name: Pull Docker image for ZAP
-          run: docker pull zaproxy/zap-weekly
-
-        - name: Run baseline scan
-          run: docker run -v /report:/zap/wrk/:rw --user root -t zaproxy/zap-weekly zap-baseline.py -t ${{env.URI}} -I -r zapreport.html
-      
-        - uses: actions/upload-artifact@v4
-          name: upload ZAP report
-          with:
-            name: ZAPreport
-            path: /report/zapreport.html
+      - name: Upload ZAP report
+        uses: actions/upload-artifact@v4
+        with:
+          name: ZAPreport
+          path: report/zapreport.html
 
   k6_load_test:
-
     runs-on: ubuntu-latest
-
+    needs: deploy  # Run only after deploy is successful
+    if: ${{ success() }}
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Pull Docker image for k6
-      run: docker pull grafana/k6
+      - name: Pull Docker image for k6
+        run: docker pull grafana/k6
 
-    - name: Run k6 load test, capture report
-      run: docker run -i grafana/k6 run - <k6tests/perf2.js > k6report.txt
+      - name: Run k6 load test, capture report
+        run: docker run -i grafana/k6 run - <k6tests/perf2.js > k6report.txt
 
-    - uses: actions/upload-artifact@v4
-      with:
-        name: k6report
-        path: k6report.txt       
+      - name: Upload k6 report
+        uses: actions/upload-artifact@v4
+        with:
+          name: k6report
+          path: k6report.txt     
 
 
