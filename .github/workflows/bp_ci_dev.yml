@@ -122,7 +122,7 @@ jobs:
         uses: azure/webapps-deploy@v2
         with:
           app-name: 'bp-ca1-ks-final-dev'
-          slot-name: 'Dev'
+          slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_0D4FF4888D7448A49858E385EE5F1433 }}
           package: .
        
