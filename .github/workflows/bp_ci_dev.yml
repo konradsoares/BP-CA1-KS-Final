@@ -163,7 +163,7 @@ jobs:
           package: .
           
     env:
-    URI: https://bmi-ca1-ks-g7azhrfvf8gkg8a9.germanywestcentral-01.azurewebsites.net/
+    URI: 'https://bmi-ca1-ks-g7azhrfvf8gkg8a9.germanywestcentral-01.azurewebsites.net/'
   zap_baseline_scan:
  
     runs-on: ubuntu-latest
