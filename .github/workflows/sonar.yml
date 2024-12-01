@@ -16,10 +16,10 @@ jobs:
         with:
           projectBaseDir: .
           args: >
-            -Dsonar.organization=gclynch
-            -Dsonar.projectKey=gclynch_bmi2021multijob
+            -Dsonar.organization=konradsoares
+            -Dsonar.projectKey=konradsoares_BP-CA1-KS-Final
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
  
 
