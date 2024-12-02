@@ -74,12 +74,23 @@ jobs:
         with:
           name: TestResults
           path: '**/*.trx'
+      # - name: Run Selenium tests
+      #   run: dotnet test D:\a\BP-CA1-KS-Final\BP-CA1-KS-Final\SeleniumTest\bin\Release\net8.0\SeleniumTest.dll --settings:SeleniumTest.runsettings --logger:"trx;LogFileName=selenium.trx"
+  
+
+      # # Upload results of selenium tests
+      # - uses: actions/upload-artifact@v4
+      #   with:
+      #     name: Selenium Tests Results
+      #     path: TestResults/selenium.trx
+      - name: dotnet publish
+        run: dotnet publish -c Release -o ${{env.AZURE_WEBAPP_PACKAGE_PATH}}/myapp
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3
         with:
-          name: build-output
-          path: ${{env.AZURE_WEBAPP_PACKAGE_PATH}}
+          name: .net-app
+          path: ${{env.AZURE_WEBAPP_PACKAGE_PATH}}/myapp
 
   scan_code:
     runs-on: ubuntu-latest
@@ -148,16 +159,17 @@ jobs:
       - name: Download artifact from build job
         uses: actions/download-artifact@v3
         with:
-          name: build-output
-          path: ${{env.AZURE_WEBAPP_PACKAGE_PATH}}
+          name: .net-app
 
-      - name: Run Selenium Tests
-        run: dotnet test ./myapp/SeleniumTest.dll --settings:SeleniumTest.runsettings --logger:"trx;LogFileName=selenium.trx"
+      - name: Run Selenium tests
+        run: dotnet test ${{env.AZURE_WEBAPP_PACKAGE_PATH}}/myapp/SeleniumTest.dll --settings:SeleniumTest.runsettings --logger:"trx;LogFileName=selenium.trx"
+  
+
       # Upload results of selenium tests
       - uses: actions/upload-artifact@v4
         with:
           name: Selenium Tests Results
-          path: TestResults/selenium.trx        
+          path: TestResults/selenium.trx
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
@@ -223,7 +235,7 @@ jobs:
 
       # - uses: actions/checkout@v4
       # - name: Run Selenium tests
-      #   run: dotnet test D:\a\BP-CA1-KS-Final\BP-CA1-KS-Final\SeleniumTest\bin\Release\net8.0\SeleniumTest.dll --settings:SeleniumTest.runsettings --logger:"trx;LogFileName=selenium.trx"
+      #   run: dotnet test ${{env.AZURE_WEBAPP_PACKAGE_PATH}}/myapp/SeleniumTest.dll --settings:SeleniumTest.runsettings --logger:"trx;LogFileName=selenium.trx"
   
 
       # # Upload results of selenium tests
