@@ -207,11 +207,14 @@ jobs:
     if: ${{ needs.deploy.result == 'success' }}  # Ensures running only after deploy is successful
     steps:
     - name: List directories for debugging
+      shell: pwsh
       run: |
-        echo "Listing current directory:"
-        ls -R .
-        echo "Listing publish directory:"
-        ls -R ./   
+        Write-Host "Listing current directory:"
+        Get-ChildItem -Recurse -Force
+        Write-Host "Listing publish directory:"
+        Get-ChildItem -Path ${{ env.AZURE_WEBAPP_PACKAGE_PATH }} -Recurse -Force  
+
+        
       # - uses: actions/checkout@v4
       # - name: Run Selenium tests
       #   run: dotnet test ${{env.AZURE_WEBAPP_PACKAGE_PATH}}\SeleniumTest\bin\Release\net8.0\SeleniumTest.dll --settings:SeleniumTest.runsettings --logger:"trx;LogFileName=selenium.trx"
