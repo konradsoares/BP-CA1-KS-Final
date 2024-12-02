@@ -75,6 +75,15 @@ jobs:
           name: TestResults
           path: '**/*.trx'
 
+      - name: Run Selenium tests
+        run: dotnet test SeleniumTest\bin\Release\net8.0\SeleniumTest.dll --settings:SeleniumTest.runsettings --logger:"trx;LogFileName=selenium.trx"
+  
+
+      # Upload results of selenium tests
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Selenium Tests Results
+          path: TestResults/selenium.trx
       - name: dotnet publish
         run: dotnet publish -c Release -o ${{env.AZURE_WEBAPP_PACKAGE_PATH}}/myapp
 
@@ -201,23 +210,23 @@ jobs:
           name: k6report
           path: k6report.txt
 
-  Selenium_test:          
-    runs-on: windows-latest
-    needs: deploy  # Depend on deploy job
-    if: ${{ needs.deploy.result == 'success' }}  # Ensures running only after deploy is successful
-    steps:
-    - name: List directories for debugging
-      shell: pwsh
-      run: |
-        Write-Host "Listing current directory:"
-        Get-ChildItem -Recurse -Force
-        Write-Host "Listing publish directory:"
-        Get-ChildItem -Path D:\a\BP-CA1-KS-Final\BP-CA1-KS-Final\ -Recurse -Force  
+  # Selenium_test:          
+  #   runs-on: windows-latest
+  #   needs: deploy  # Depend on deploy job
+  #   if: ${{ needs.deploy.result == 'success' }}  # Ensures running only after deploy is successful
+  #   steps:
+  #   - name: List directories for debugging
+  #     shell: pwsh
+  #     run: |
+  #       Write-Host "Listing current directory:"
+  #       Get-ChildItem -Recurse -Force
+  #       Write-Host "Listing publish directory:"
+  #       Get-ChildItem -Path D:\a\BP-CA1-KS-Final\BP-CA1-KS-Final\ -Recurse -Force  
 
 
       # - uses: actions/checkout@v4
       # - name: Run Selenium tests
-      #   run: dotnet test ${{env.AZURE_WEBAPP_PACKAGE_PATH}}\SeleniumTest\bin\Release\net8.0\SeleniumTest.dll --settings:SeleniumTest.runsettings --logger:"trx;LogFileName=selenium.trx"
+      #   run: dotnet test D:\a\BP-CA1-KS-Final\BP-CA1-KS-Final\SeleniumTest\bin\Release\net8.0\SeleniumTest.dll --settings:SeleniumTest.runsettings --logger:"trx;LogFileName=selenium.trx"
   
 
       # # Upload results of selenium tests
