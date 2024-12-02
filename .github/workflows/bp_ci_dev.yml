@@ -212,7 +212,7 @@ jobs:
         Write-Host "Listing current directory:"
         Get-ChildItem -Recurse -Force
         Write-Host "Listing publish directory:"
-        Get-ChildItem -Path \ -Recurse -Force  
+        Get-ChildItem -Path BP-CA1-KS-Final -Recurse -Force  
 
 
       # - uses: actions/checkout@v4
