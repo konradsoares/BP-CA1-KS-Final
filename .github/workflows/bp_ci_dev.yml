@@ -200,18 +200,19 @@ jobs:
         with:
           name: k6report
           path: k6report.txt
-            
+
   Selenium_test:          
-    # Run Selenium tests
     runs-on: windows-latest
     needs: deploy  # Depend on deploy job
     if: ${{ needs.deploy.result == 'success' }}  # Ensures running only after deploy is successful
-    - name: Run Selenium tests
-      run: dotnet test ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/myapp/SeleniumTest.dll --settings:SeleniumTest.runsettings --logger:"trx;LogFileName=selenium.trx"
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Selenium tests
+        run: dotnet test ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/myapp/SeleniumTest.dll --settings:SeleniumTest.runsettings --logger:"trx;LogFileName=selenium.trx"
   
-    # Upload results of selenium tests
-    - uses: actions/upload-artifact@v4
-      with:
-        name: Selenium Tests Results
-        path: TestResults/selenium.trx
+      # Upload results of selenium tests
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Selenium Tests Results
+          path: TestResults/selenium.trx
 
