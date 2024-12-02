@@ -211,7 +211,7 @@ jobs:
         echo "Listing current directory:"
         ls -R .
         echo "Listing publish directory:"
-        ls -R "./"   
+        ls -R ./   
       # - uses: actions/checkout@v4
       # - name: Run Selenium tests
       #   run: dotnet test ${{env.AZURE_WEBAPP_PACKAGE_PATH}}\SeleniumTest\bin\Release\net8.0\SeleniumTest.dll --settings:SeleniumTest.runsettings --logger:"trx;LogFileName=selenium.trx"
