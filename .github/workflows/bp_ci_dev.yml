@@ -168,7 +168,7 @@ jobs:
           app-name: 'bp-ca1-ks-final-dev'
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_0D4FF4888D7448A49858E385EE5F1433 }}
-          package: .
+          package: '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/myapp'
           
       # - name: Run Selenium tests
       #   run: dotnet test ${{env.AZURE_WEBAPP_PACKAGE_PATH}}/myapp/SeleniumTest.dll --settings:SeleniumTest.runsettings --logger:"trx;LogFileName=selenium.trx"
