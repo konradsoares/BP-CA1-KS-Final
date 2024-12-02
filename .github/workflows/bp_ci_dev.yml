@@ -75,23 +75,11 @@ jobs:
           name: TestResults
           path: '**/*.trx'
 
-      - name: Run Selenium tests
-        run: dotnet test SeleniumTest\bin\Release\net8.0\SeleniumTest.dll --settings:SeleniumTest.runsettings --logger:"trx;LogFileName=selenium.trx"
-  
-
-      # Upload results of selenium tests
-      - uses: actions/upload-artifact@v4
-        with:
-          name: Selenium Tests Results
-          path: TestResults/selenium.trx
-      - name: dotnet publish
-        run: dotnet publish -c Release -o ${{env.AZURE_WEBAPP_PACKAGE_PATH}}/myapp
-
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3
         with:
-          name: .net-app
-          path: ${{env.AZURE_WEBAPP_PACKAGE_PATH}}/myapp
+          name: build-output
+          path: ${{env.AZURE_WEBAPP_PACKAGE_PATH}}
 
   scan_code:
     runs-on: ubuntu-latest
@@ -160,7 +148,16 @@ jobs:
       - name: Download artifact from build job
         uses: actions/download-artifact@v3
         with:
-          name: .net-app
+          name: build-output
+          path: ./myapp
+
+      - name: Run Selenium Tests
+        run: dotnet test ./myapp/SeleniumTest.dll --settings:SeleniumTest.runsettings --logger:"trx;LogFileName=selenium.trx"
+      # Upload results of selenium tests
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Selenium Tests Results
+          path: TestResults/selenium.trx        
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
