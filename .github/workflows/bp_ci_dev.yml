@@ -74,15 +74,15 @@ jobs:
         with:
           name: TestResults
           path: '**/*.trx'
-      # - name: Run Selenium tests
-      #   run: dotnet test D:\a\BP-CA1-KS-Final\BP-CA1-KS-Final\SeleniumTest\bin\Release\net8.0\SeleniumTest.dll --settings:SeleniumTest.runsettings --logger:"trx;LogFileName=selenium.trx"
+      - name: Run Selenium tests
+        run: dotnet test D:\a\BP-CA1-KS-Final\BP-CA1-KS-Final\SeleniumTest\bin\Release\net8.0\SeleniumTest.dll --settings:SeleniumTest.runsettings --logger:"trx;LogFileName=selenium.trx"
   
 
-      # # Upload results of selenium tests
-      # - uses: actions/upload-artifact@v4
-      #   with:
-      #     name: Selenium Tests Results
-      #     path: TestResults/selenium.trx
+      # Upload results of selenium tests
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Selenium Tests Results
+          path: TestResults/selenium.trx
       - name: dotnet publish
         run: dotnet publish -c Release -o ${{env.AZURE_WEBAPP_PACKAGE_PATH}}/myapp
 
@@ -156,21 +156,10 @@ jobs:
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
     steps:
-      - name: List files in deployment directory
-        run: |
-          echo "Listing files in deployment directory:"
-          dir ${GITHUB_WORKSPACE}
-          dir publish/myapp
-
       - name: Download artifact from build job
         uses: actions/download-artifact@v3
         with:
           name: .net-app
-      # - name: Download artifact from build job
-      #   uses: actions/download-artifact@v3
-      #   with:
-      #     name: .net-app
-      #     path: ${GITHUB_WORKSPACE}/publish
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
