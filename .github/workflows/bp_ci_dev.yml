@@ -208,7 +208,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Run Selenium tests
-        run: dotnet test ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/SeleniumTest/bin/Release/net8.0/SeleniumTest.dll --settings:SeleniumTest.runsettings --logger:"trx;LogFileName=selenium.trx"
+        run: dotnet test ${{ env.AZURE_WEBAPP_NAME }}/SeleniumTest/bin/Release/net8.0/SeleniumTest.dll --settings:SeleniumTest.runsettings --logger:"trx;LogFileName=selenium.trx"
   
       # Upload results of selenium tests
       - uses: actions/upload-artifact@v4
