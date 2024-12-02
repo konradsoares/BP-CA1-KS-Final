@@ -2,12 +2,12 @@ name: BP_CA1_KS_FINAL_DEV
 
 env:
   AZURE_WEBAPP_NAME: BP-CA1-KS-Final-Dev
-  AZURE_WEBAPP_PACKAGE_PATH: 'publish/myapp'
+  AZURE_WEBAPP_PACKAGE_PATH: 'publish'
 
 on:
-  push:
-    branches:
-      - dev
+  # push:
+  #   branches:
+  #     - dev
   workflow_dispatch:
 
 # jobs:
@@ -52,6 +52,7 @@ on:
 
 jobs:
   build:
+    needs: dependency_check
     runs-on: windows-latest
 
     steps:
@@ -74,16 +75,32 @@ jobs:
         with:
           name: TestResults
           path: '**/*.trx'
+      # - name: Run Selenium tests
+      #   run: dotnet test D:\a\BP-CA1-KS-Final\BP-CA1-KS-Final\SeleniumTest\bin\Release\net8.0\SeleniumTest.dll --settings:SeleniumTest.runsettings --logger:"trx;LogFileName=selenium.trx"
+  
 
-      - name: dotnet publish
-        run: dotnet publish -c Release -o ${{env.AZURE_WEBAPP_PACKAGE_PATH}}/myapp
+      # # Upload results of selenium tests
+      # - uses: actions/upload-artifact@v4
+      #   with:
+      #     name: Selenium Tests Results
+      #     path: TestResults/selenium.trx
 
-      - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v3
+  scan_code:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
         with:
-          name: .net-app
-          path: ${{env.AZURE_WEBAPP_PACKAGE_PATH}}/myapp
-
+          fetch-depth: 0  
+      - name: SonarCloud Scan
+        uses: sonarsource/sonarcloud-github-action@master
+        with:
+          projectBaseDir: .
+          args: >
+            -Dsonar.organization=konradsoares
+            -Dsonar.projectKey=konradsoares_BP-CA1-KS-Final
+        env:
+          GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
       # - name: Send Telegram Success Message
       #   if: success()
@@ -103,28 +120,129 @@ jobs:
       #       text    = "❌ CI Pipeline failed on branch ${{ github.ref }}."
       #     }
       #     Invoke-RestMethod -Uri "https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMessage" -Method Post -Body $Body
+  dependency_check:
+    needs: scan_code
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run OWASP Dependency Check
+        uses: dependency-check/Dependency-Check_Action@main
+        with:
+          project: 'BP-CA1-KS-Final'  # Ensure 'project' is specified
+          path: '.'
+          format: 'HTML'
+          out: 'reports'
+          args: '--failOnCVSS 8'
+
+      - name: Upload Dependency Check Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: Depcheck-report
+          path: reports
 
   deploy:
-    runs-on: windows-latest
+    name: deploy, run E2E tests
     needs: build
     environment:
       name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
-
+    runs-on: windows-latest
     steps:
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v3
-        with:
-          name: .net-app
+    - uses: actions/checkout@v4    
+    - name: dotnet publish
+      run: dotnet publish -c Release -o ${{env.AZURE_WEBAPP_PACKAGE_PATH}}/myapp
 
-      - name: Deploy to Azure Web App
-        id: deploy-to-webapp
-        uses: azure/webapps-deploy@v2
-        with:
-          app-name: 'bp-ca1-ks-final-dev'
-          slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_0D4FF4888D7448A49858E385EE5F1433 }}
-          package: .
-       
+      # - name: Upload artifact for deployment job
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: .net-app
+      #     path: ${{env.AZURE_WEBAPP_PACKAGE_PATH}}/myapp    
+      # - name: Download artifact from build job
+      #   uses: actions/download-artifact@v3
+      #   with:
+      #     name: .net-app
 
+    - name: Deploy to Azure Web App
+      # id: deploy-to-webapp
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: 'bp-ca1-ks-final-dev'
+        slot-name: 'Production'
+        publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_0D4FF4888D7448A49858E385EE5F1433 }}
+        package: '${{env.AZURE_WEBAPP_PACKAGE_PATH}}/myapp'
+        
+    - name: Run Selenium tests
+      run: dotnet test ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/myapp/SeleniumTest.dll /Settings:SeleniumTest_Dev.runsettings --logger:"trx;LogFileName=selenium.trx"
+
+
+    # Upload results of selenium tests
+    - uses: actions/upload-artifact@v4
+      with:
+        name: Selenium Tests Results
+        path: TestResults/selenium.trx
+
+  zap_baseline_scan:
+    env:
+      URI: 'https://bp-ca1-ks-final-dev-efbdh3a8hfgufufu.germanywestcentral-01.azurewebsites.net/' 
+    runs-on: ubuntu-latest
+    needs: deploy  # Depend on deploy job
+    if: ${{ needs.deploy.result == 'success' }}  # Ensures running only after deploy is successful
+    steps:
+      - name: Pull Docker image for ZAP
+        run: docker pull zaproxy/zap-weekly
+
+      - name: Run baseline scan
+        run: docker run -v ${{ github.workspace }}/report:/zap/wrk/:rw --user root -t zaproxy/zap-weekly zap-baseline.py -t ${{ env.URI }} -I -r zapreport.html
+
+      - name: Upload ZAP report
+        uses: actions/upload-artifact@v4
+        with:
+          name: ZAPreport
+          path: report/zapreport.html
+
+  k6_load_test:
+    runs-on: ubuntu-latest
+    needs: deploy  # Depend on deploy job
+    if: ${{ needs.deploy.result == 'success' }}  # Ensures running only after deploy is successful
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Pull Docker image for k6
+        run: docker pull grafana/k6
+
+      - name: Run k6 load test, capture report
+        run: docker run -i grafana/k6 run - <k6tests/perf2.js > k6report.txt
+
+      - name: Upload k6 report
+        uses: actions/upload-artifact@v4
+        with:
+          name: k6report
+          path: k6report.txt
+
+  # Selenium_test:          
+  #   runs-on: windows-latest
+  #   needs: deploy  # Depend on deploy job
+  #   if: ${{ needs.deploy.result == 'success' }}  # Ensures running only after deploy is successful
+  #   steps:
+  #   - name: List directories for debugging
+  #     shell: pwsh
+  #     run: |
+  #       Write-Host "Listing current directory:"
+  #       Get-ChildItem -Recurse -Force
+  #       Write-Host "Listing publish directory:"
+  #       Get-ChildItem -Path D:\a\BP-CA1-KS-Final\BP-CA1-KS-Final\ -Recurse -Force  
+
+
+      # - uses: actions/checkout@v4
+      # - name: Run Selenium tests
+      #   run: dotnet test ${{env.AZURE_WEBAPP_PACKAGE_PATH}}/myapp/SeleniumTest.dll --settings:SeleniumTest.runsettings --logger:"trx;LogFileName=selenium.trx"
+  
+
+      # # Upload results of selenium tests
+      # - uses: actions/upload-artifact@v4
+      #   with:
+      #     name: Selenium Tests Results
+      #     path: TestResults/selenium.trx
 
