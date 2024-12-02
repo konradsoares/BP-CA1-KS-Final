@@ -174,7 +174,7 @@ jobs:
         package: '${{env.AZURE_WEBAPP_PACKAGE_PATH}}/myapp'
         
     - name: Run Selenium tests
-      run: dotnet test ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/myapp/SeleniumTest.dll /Settings:SeleniumTest.runsettings --logger:"trx;LogFileName=selenium.trx"
+      run: dotnet test ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/myapp/SeleniumTest.dll /Settings:SeleniumTest_Dev.runsettings --logger:"trx;LogFileName=selenium.trx"
 
 
     # Upload results of selenium tests
