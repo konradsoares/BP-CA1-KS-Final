@@ -149,7 +149,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: build-output
-          path: ./myapp
+          path: ${{env.AZURE_WEBAPP_PACKAGE_PATH}}
 
       - name: Run Selenium Tests
         run: dotnet test ./myapp/SeleniumTest.dll --settings:SeleniumTest.runsettings --logger:"trx;LogFileName=selenium.trx"
