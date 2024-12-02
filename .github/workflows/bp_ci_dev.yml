@@ -83,14 +83,6 @@ jobs:
       #   with:
       #     name: Selenium Tests Results
       #     path: TestResults/selenium.trx
-      - name: dotnet publish
-        run: dotnet publish -c Release -o ${{env.AZURE_WEBAPP_PACKAGE_PATH}}/myapp
-
-      - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v3
-        with:
-          name: .net-app
-          path: ${{env.AZURE_WEBAPP_PACKAGE_PATH}}/myapp
 
   scan_code:
     runs-on: ubuntu-latest
@@ -156,10 +148,18 @@ jobs:
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
     steps:
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v3
-        with:
-          name: .net-app
+      - name: dotnet publish
+        run: dotnet publish -c Release -o ${{env.AZURE_WEBAPP_PACKAGE_PATH}}/myapp
+
+      # - name: Upload artifact for deployment job
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: .net-app
+      #     path: ${{env.AZURE_WEBAPP_PACKAGE_PATH}}/myapp    
+      # - name: Download artifact from build job
+      #   uses: actions/download-artifact@v3
+      #   with:
+      #     name: .net-app
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
@@ -170,15 +170,15 @@ jobs:
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_0D4FF4888D7448A49858E385EE5F1433 }}
           package: .
           
-      # - name: Run Selenium tests
-      #   run: dotnet test ${{env.AZURE_WEBAPP_PACKAGE_PATH}}/myapp/SeleniumTest.dll --settings:SeleniumTest.runsettings --logger:"trx;LogFileName=selenium.trx"
-  
+        - name: Run Selenium tests
+          run: dotnet test ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/myapp/SeleniumTest.dll /Settings:SeleniumTest.runsettings --logger:"trx;LogFileName=selenium.trx"
+    
 
-      # # Upload results of selenium tests
-      # - uses: actions/upload-artifact@v4
-      #   with:
-      #     name: Selenium Tests Results
-      #     path: TestResults/selenium.trx
+        # Upload results of selenium tests
+        - uses: actions/upload-artifact@v4
+          with:
+            name: Selenium Tests Results
+            path: TestResults/selenium.trx
 
   zap_baseline_scan:
     env:
