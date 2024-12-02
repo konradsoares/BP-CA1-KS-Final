@@ -146,7 +146,7 @@ jobs:
     name: deploy, run E2E tests
     needs: build
     environment:
-      name: 'Canary'
+      name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
     runs-on: windows-latest
     steps:
@@ -169,7 +169,7 @@ jobs:
       uses: azure/webapps-deploy@v2
       with:
         app-name: 'bp-ca1-ks-final-canary'
-        slot-name: 'Canary'
+        slot-name: 'Production'
         publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_793C3CAD35A045BEA16BFC9204B57B9A }}
         package: '${{env.AZURE_WEBAPP_PACKAGE_PATH}}/myapp'
         
