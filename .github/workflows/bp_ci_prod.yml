@@ -1,4 +1,4 @@
-name: BP_CA1_KS_FINAL_DEV
+name: BP_CA1_KS_FINAL_PROD
 
 env:
   AZURE_WEBAPP_NAME: bp-ca1-ks-final
@@ -76,7 +76,7 @@ jobs:
           name: TestResults
           path: '**/*.trx'
       # - name: Run Selenium tests
-      #   run: dotnet test D:\a\BP-CA1-KS-Final\BP-CA1-KS-Final\SeleniumTest\bin\Release\net8.0\SeleniumTest.dll --settings:SeleniumTest.runsettings --logger:"trx;LogFileName=selenium.trx"
+      #   run: dotnet test D:\a\BP-CA1-KS-Final\BP-CA1-KS-Final\SeleniumTest\bin\Release\net8.0\SeleniumTest.dll --settings:SeleniumTest_Prod.runsettings --logger:"trx;LogFileName=selenium.trx"
   
 
       # # Upload results of selenium tests
