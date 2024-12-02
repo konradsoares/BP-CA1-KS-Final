@@ -52,6 +52,7 @@ on:
 
 jobs:
   build:
+    needs: scan_code, dependency_check
     runs-on: windows-latest
 
     steps:
