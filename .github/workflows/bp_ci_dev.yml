@@ -52,7 +52,7 @@ on:
 
 jobs:
   build:
-    needs: scan_code, dependency_check
+    needs: dependency_check
     runs-on: windows-latest
 
     steps:
@@ -121,6 +121,7 @@ jobs:
       #     }
       #     Invoke-RestMethod -Uri "https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMessage" -Method Post -Body $Body
   dependency_check:
+    needs: scan_code
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
