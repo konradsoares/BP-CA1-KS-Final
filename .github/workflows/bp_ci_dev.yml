@@ -2,7 +2,7 @@ name: BP_CA1_KS_FINAL_DEV
 
 env:
   AZURE_WEBAPP_NAME: BP-CA1-KS-Final-Dev
-  AZURE_WEBAPP_PACKAGE_PATH: 'publish/myapp'
+  AZURE_WEBAPP_PACKAGE_PATH: 'publish'
 
 on:
   # push:
@@ -161,6 +161,15 @@ jobs:
         with:
           name: .net-app
 
+      - name: Deploy to Azure Web App
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: 'bp-ca1-ks-final-dev'
+          slot-name: 'Production'
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_0D4FF4888D7448A49858E385EE5F1433 }}
+          package: '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/myapp'
+          
       - name: Run Selenium tests
         run: dotnet test ${{env.AZURE_WEBAPP_PACKAGE_PATH}}/myapp/SeleniumTest.dll --settings:SeleniumTest.runsettings --logger:"trx;LogFileName=selenium.trx"
   
@@ -170,17 +179,7 @@ jobs:
         with:
           name: Selenium Tests Results
           path: TestResults/selenium.trx
-
-      - name: Deploy to Azure Web App
-        id: deploy-to-webapp
-        uses: azure/webapps-deploy@v2
-        with:
-          app-name: 'bp-ca1-ks-final-dev'
-          slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_0D4FF4888D7448A49858E385EE5F1433 }}
-          package: .
           
-
   zap_baseline_scan:
     env:
       URI: 'https://bp-ca1-ks-final-dev-efbdh3a8hfgufufu.germanywestcentral-01.azurewebsites.net/' 
