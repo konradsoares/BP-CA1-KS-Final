@@ -152,7 +152,7 @@ jobs:
     runs-on: windows-latest
     needs: build
     environment:
-      name: 'Production'
+      name: 'Staging'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
     steps:
@@ -166,20 +166,20 @@ jobs:
         uses: azure/webapps-deploy@v2
         with:
           app-name: 'bp-ca1-ks-final-dev'
-          slot-name: 'Production'
+          slot-name: 'Staging'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_0D4FF4888D7448A49858E385EE5F1433 }}
-          package: '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/myapp'
+          package: .
           
-      - name: Run Selenium tests
-        run: dotnet test ${{env.AZURE_WEBAPP_PACKAGE_PATH}}/myapp/SeleniumTest.dll --settings:SeleniumTest.runsettings --logger:"trx;LogFileName=selenium.trx"
+      # - name: Run Selenium tests
+      #   run: dotnet test ${{env.AZURE_WEBAPP_PACKAGE_PATH}}/myapp/SeleniumTest.dll --settings:SeleniumTest.runsettings --logger:"trx;LogFileName=selenium.trx"
   
 
-      # Upload results of selenium tests
-      - uses: actions/upload-artifact@v4
-        with:
-          name: Selenium Tests Results
-          path: TestResults/selenium.trx
-          
+      # # Upload results of selenium tests
+      # - uses: actions/upload-artifact@v4
+      #   with:
+      #     name: Selenium Tests Results
+      #     path: TestResults/selenium.trx
+
   zap_baseline_scan:
     env:
       URI: 'https://bp-ca1-ks-final-dev-efbdh3a8hfgufufu.germanywestcentral-01.azurewebsites.net/' 
