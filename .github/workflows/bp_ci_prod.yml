@@ -5,9 +5,9 @@ env:
   AZURE_WEBAPP_PACKAGE_PATH: 'publish'
 
 on:
-  # push:
-  #   branches:
-  #     - dev
+  merge:
+    branches:
+      - main
   workflow_dispatch:
 
 # jobs:
