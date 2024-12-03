@@ -185,7 +185,7 @@ jobs:
 
   zap_baseline_scan:
     env:
-      URI: 'https://bp-ca1-ks-final-canary-bkgechh5cegcffd9.germanywestcentral-01.azurewebsites.net/' 
+      URI: 'https://bp-ca1-ks-final-canary-ghhhbkfpbwa4cxgd.francecentral-01.azurewebsites.net/' 
     runs-on: ubuntu-latest
     needs: deploy  # Depend on deploy job
     if: ${{ needs.deploy.result == 'success' }}  # Ensures running only after deploy is successful
