@@ -61,33 +61,28 @@ namespace SeleniumTest
           
             using (IWebDriver driver = new ChromeDriver(chromeDriverPath))
             {
-                // any exception below results in a test fail
-
-                // navigate to URI for temperature converter
-                // web app running on IIS express
+                // Navigate to the web app
                 driver.Navigate().GoToUrl(webAppUri);
 
-                // get Systolic in Systolic element
-                IWebElement SystolicInSystolicElement = driver.FindElement(By.Id("BP_Systolic"));
-                // enter 100 in element
-                SystolicInSystolicElement.SendKeys("100");
+                // Enter systolic and diastolic values
+                IWebElement SystolicElement = driver.FindElement(By.Id("BP_Systolic"));
+                SystolicElement.SendKeys("110");  // Ideal BP systolic value (adjusted for "Ideal" test)
 
-                // get Diastolic in Diastolic element
-                IWebElement DiastolicInDiastolicElement = driver.FindElement(By.Id("BP_Diastolic"));
-                // enter 10 in element
-                DiastolicInDiastolicElement.SendKeys("60");
+                IWebElement DiastolicElement = driver.FindElement(By.Id("BP_Diastolic"));
+                DiastolicElement.SendKeys("75");  // Ideal BP diastolic value (adjusted for "Ideal" test)
 
-                // submit the form
+                // Submit the form
                 driver.FindElement(By.CssSelector(".btn")).Submit();
 
-                // explictly wait for result with "BMIValue" item
+                // Explicitly wait for the result
                 IWebElement BPValueElement = new WebDriverWait(driver, TimeSpan.FromSeconds(10))
-                    .Until(c => c.FindElement(By.CssSelector("div.form-group:nth-child(4)")));
+                    .Until(c => c.FindElement(By.CssSelector("#form1 > div:nth-child(4) > input")));
 
-                // item comes back like "BMIValue: 24.96"
-                String bp = BPValueElement.Text.ToString();
+                // Get the value attribute instead of text
+                string bpResult = BPValueElement.GetAttribute("value");
 
-                StringAssert.EndsWith(bp, "Ideal Blood Pressure");
+                // Validate the result
+                StringAssert.EndsWith(bpResult, "Ideal");  // Since the input value is "Ideal"
 
                 driver.Quit();
 
