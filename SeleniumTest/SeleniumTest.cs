@@ -82,7 +82,7 @@ namespace SeleniumTest
 
                 // explictly wait for result with "BMIValue" item
                 IWebElement BPValueElement = new WebDriverWait(driver, TimeSpan.FromSeconds(10))
-                    .Until(c => c.FindElement(By.CssSelector("div.form-group:nth-child(4)")));
+                    .Until(c => c.FindElement(By.CssSelector("#form1 > div:nth-child(4) > input")));
 
                 // item comes back like "BMIValue: 24.96"
                 String bp = BPValueElement.Text.ToString();
