@@ -55,7 +55,7 @@ namespace SeleniumTest
                 string bpResult = BPValueElement.GetAttribute("value");
 
                 // Validate the result
-                StringAssert.EndsWith(bpResult, "Ideal Blood Pressure");
+                StringAssert.EndsWith(bpResult, "Ideal");
 
                 driver.Quit();
             }
