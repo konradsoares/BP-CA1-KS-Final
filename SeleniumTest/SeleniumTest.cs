@@ -3,7 +3,6 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
 using System;
-using SeleniumExtras.WaitHelpers;
 
 namespace SeleniumTest
 {
@@ -23,7 +22,7 @@ namespace SeleniumTest
         [TestInitialize]
         public void Setup()
         {
-            this.webAppUri = "https://bp-ca1-ks-finalendpoint-epfhcxa8f7brb2fn.z01.azurefd.net/";
+            this.webAppUri = "https://bp-ca1-ks-final-bkgechh5cegcffd9.germanywestcentral-01.azurewebsites.net/";
         }
 
         [TestMethod]
@@ -50,17 +49,13 @@ namespace SeleniumTest
 
                 // Explicitly wait for the result
                 IWebElement BPValueElement = new WebDriverWait(driver, TimeSpan.FromSeconds(10))
-                    .Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementIsVisible(By.CssSelector("#form1 > div:nth-child(4)")));
+                    .Until(c => c.FindElement(By.CssSelector("#form1 > div:nth-child(4)")));
 
-                // Get the text or value attribute
-                string bpResult = BPValueElement.GetAttribute("value") ?? BPValueElement.Text;
-
-                // Log the result for debugging
-                Console.WriteLine($"BP Result: {bpResult}");
+                // Get the value attribute instead of text
+                string bpResult = BPValueElement.GetAttribute("value");
 
                 // Validate the result
-                Assert.IsNotNull(bpResult, "BP Result should not be null or empty.");
-                StringAssert.EndsWith(bpResult, "Ideal", "Expected BP result to end with 'Ideal'.");
+                StringAssert.EndsWith(bpResult, "Ideal");
 
                 driver.Quit();
             }
