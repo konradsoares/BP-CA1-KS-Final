@@ -45,14 +45,14 @@ namespace SeleniumTest
                 DiastolicElement.SendKeys("75");  // Ideal BP diastolic value
 
                 // Submit the form
-                driver.FindElement(By.CssSelector(".btn")).Submit();
+                driver.FindElement(By.Id("btn btn-default")).Submit();
 
                 // Explicitly wait for the result
                 IWebElement BPValueElement = new WebDriverWait(driver, TimeSpan.FromSeconds(10))
                     .Until(c => c.FindElement(By.CssSelector("#form1 > div:nth-child(4)")));
 
                 // Get the value attribute instead of text
-                string bpResult = BPValueElement.GetAttribute("value");
+                string bpResult = BPValueElement.Text.ToString();
 
                 // Validate the result
                 StringAssert.EndsWith(bpResult, "Ideal");
