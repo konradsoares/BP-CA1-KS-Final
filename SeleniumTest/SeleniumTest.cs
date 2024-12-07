@@ -49,13 +49,17 @@ namespace SeleniumTest
 
                 // Explicitly wait for the result
                 IWebElement BPValueElement = new WebDriverWait(driver, TimeSpan.FromSeconds(10))
-                    .Until(c => c.FindElement(By.CssSelector("#form1 > div:nth-child(4)")));
+                    .Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementIsVisible(By.CssSelector("#form1 > div:nth-child(4)")));
 
-                // Get the value attribute instead of text
-                string bpResult = BPValueElement.GetAttribute("value");
+                // Get the text or value attribute
+                string bpResult = BPValueElement.GetAttribute("value") ?? BPValueElement.Text;
+
+                // Log the result for debugging
+                Console.WriteLine($"BP Result: {bpResult}");
 
                 // Validate the result
-                StringAssert.EndsWith(bpResult, "Ideal");
+                Assert.IsNotNull(bpResult, "BP Result should not be null or empty.");
+                StringAssert.EndsWith(bpResult, "Ideal", "Expected BP result to end with 'Ideal'.");
 
                 driver.Quit();
             }
