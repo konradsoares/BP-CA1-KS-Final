@@ -49,7 +49,7 @@ namespace SeleniumTest
 
                 // Explicitly wait for the result
                 IWebElement BPValueElement = new WebDriverWait(driver, TimeSpan.FromSeconds(10))
-                    .Until(c => c.FindElement(By.CssSelector("#form1 > div:nth-child(4) > input")));
+                    .Until(c => c.FindElement(By.CssSelector("#form1 > div:nth-child(4)")));
 
                 // Get the value attribute instead of text
                 string bpResult = BPValueElement.GetAttribute("value");
