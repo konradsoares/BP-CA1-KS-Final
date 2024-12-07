@@ -41,18 +41,5 @@ namespace BPCalculator
             }
         }
 
-        // Calculate Mean Arterial Pressure (MAP)
-        //public double MeanArterialPressure
-        //{
-        //    get
-        //    {
-        //        double map = (Systolic + 2 * Diastolic) / 3.0;
-        //        if (map < 50 || map > 150)
-        //        {
-        //            throw new InvalidOperationException("Mean Arterial Pressure out of range.");
-        //        }
-        //        return map;
-        //    }
-        //}
     }
 }
