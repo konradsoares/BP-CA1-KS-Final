@@ -1,28 +1,56 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+// NuGet install Selenium WebDriver package and Support Classes
+ 
 using OpenQA.Selenium;
+
+// NuGet install Chrome Driver
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
 using System;
+
+// run 2 instances of VS to do run Selenium tests against localhost
+// instance 1 : run web app e.g. on IIS Express
+// instance 2 : from Test Explorer run Selenium test
+// or use the dotnet vstest task
+// e.g. dotnet vstest SeleniumTest\bin\debug\netcoreapp2.1\seleniumtest.dll /Settings:SeleniumTest.runsettings
 
 namespace SeleniumTest
 {
     [TestClass]
     public class UnitTest1
     {
+        // .runsettings file contains test run parameters
+        // e.g. URI for app
+        // test context for this run
+
         private TestContext testContextInstance;
 
+        // test harness uses this property to initliase test context
         public TestContext TestContext
         {
             get { return testContextInstance; }
             set { testContextInstance = value; }
         }
 
+        // URI for web app being tested
         private String webAppUri;
 
-        [TestInitialize]
+        // .runsettings property overriden in vsts test runner 
+        // release task to point to run settings file
+        // also webAppUri overriden to use pipeline variable
+
+        [TestInitialize]                // run before each unit test
         public void Setup()
         {
+<<<<<<< HEAD
             this.webAppUri = "https://bp-ca1-ks-final-canary-ghhhbkfpbwa4cxgd.francecentral-01.azurewebsites.net/";
+=======
+            // read URL from SeleniumTest.runsettings (configure run settings)
+            //this.webAppUri = testContextInstance.Properties["webAppUri"].ToString();
+
+            this.webAppUri = "https://bp-ca1-ks-final-dev-efbdh3a8hfgufufu.germanywestcentral-01.azurewebsites.net/";
+>>>>>>> e57157a797a0afed390e0e61f2a470be4ef2ccb2
         }
 
         [TestMethod]
@@ -42,7 +70,7 @@ namespace SeleniumTest
 
                 IWebElement DiastolicElement = driver.FindElement(By.Id("BP_Diastolic"));
                 DiastolicElement.Clear(); // Clear existing value
-                DiastolicElement.SendKeys("75");  // Ideal BP diastolic value
+                DiastolicElement.SendKeys("81");  // Ideal BP diastolic value
 
                 // Submit the form
                 driver.FindElement(By.CssSelector(".btn.btn-default")).Click();
@@ -51,11 +79,25 @@ namespace SeleniumTest
                 IWebElement BPValueElement = new WebDriverWait(driver, TimeSpan.FromSeconds(10))
                     .Until(c => c.FindElement(By.CssSelector("#form1 > div:nth-child(4)")));
 
+<<<<<<< HEAD
                 // Get the value attribute instead of text
                 string bpResult = BPValueElement.Text.ToString();
 
                 // Validate the result
                 StringAssert.EndsWith(bpResult, "Ideal Blood Pressure");
+=======
+                // Get the value attribute
+                string bpResult = BPValueElement.GetAttribute("value");
+
+                // Validate the result
+                StringAssert.EndsWith(bpResult, "PreHigh");
+
+                // Check the background color of the input field
+                string backgroundColor = BPValueElement.GetCssValue("background-color");
+
+                // Validate the color is orange (RGB or HEX)
+                Assert.AreEqual("rgba(255, 165, 0, 1)", backgroundColor, "The input field does not have the expected orange background color.");
+>>>>>>> e57157a797a0afed390e0e61f2a470be4ef2ccb2
 
                 driver.Quit();
             }
