@@ -66,7 +66,7 @@ namespace SeleniumTest
 
                 IWebElement DiastolicElement = driver.FindElement(By.Id("BP_Diastolic"));
                 DiastolicElement.Clear(); // Clear existing value
-                DiastolicElement.SendKeys("75");  // Ideal BP diastolic value
+                DiastolicElement.SendKeys("81");  // Ideal BP diastolic value
 
                 // Submit the form
                 driver.FindElement(By.CssSelector(".btn.btn-default")).Click();
@@ -75,15 +75,19 @@ namespace SeleniumTest
                 IWebElement BPValueElement = new WebDriverWait(driver, TimeSpan.FromSeconds(10))
                     .Until(c => c.FindElement(By.CssSelector("#form1 > div:nth-child(4) > input")));
 
-                // Get the value attribute instead of text
+                // Get the value attribute
                 string bpResult = BPValueElement.GetAttribute("value");
 
                 // Validate the result
-                StringAssert.EndsWith(bpResult, "Ideal");
+                StringAssert.EndsWith(bpResult, "PreHigh");
+
+                // Check the background color of the input field
+                string backgroundColor = BPValueElement.GetCssValue("background-color");
+
+                // Validate the color is orange (RGB or HEX)
+                Assert.AreEqual("rgba(255, 165, 0, 1)", backgroundColor, "The input field does not have the expected orange background color.");
 
                 driver.Quit();
-
-                // alternative - use Cypress or Playright
             }
         }
     }
