@@ -22,7 +22,7 @@ namespace SeleniumTest
         [TestInitialize]
         public void Setup()
         {
-            this.webAppUri = "https://bp-ca1-ks-final-bkgechh5cegcffd9.germanywestcentral-01.azurewebsites.net/";
+            this.webAppUri = "https://bp-ca1-ks-final-canary-ghhhbkfpbwa4cxgd.francecentral-01.azurewebsites.net/";
         }
 
         [TestMethod]
