@@ -46,19 +46,14 @@ namespace SeleniumTest
             // read URL from SeleniumTest.runsettings (configure run settings)
             //this.webAppUri = testContextInstance.Properties["webAppUri"].ToString();
 
-            this.webAppUri = "https://bp-ca1-ks-final-dev-efbdh3a8hfgufufu.germanywestcentral-01.azurewebsites.net/";
+            this.webAppUri = "https://bp-ca1-ks-final-canary-ghhhbkfpbwa4cxgd.francecentral-01.azurewebsites.net/";
         }
 
         [TestMethod]
         public void TestBP()
         {
+            String chromeDriverPath = Environment.GetEnvironmentVariable("ChromeWebDriver") ?? ".";
 
-            String chromeDriverPath = Environment.GetEnvironmentVariable("ChromeWebDriver");
-            if (chromeDriverPath is null)
-            {
-                chromeDriverPath = ".";                 // for IDE
-            }
-          
             using (IWebDriver driver = new ChromeDriver(chromeDriverPath))
             {
                 // Navigate to the web app
@@ -66,23 +61,25 @@ namespace SeleniumTest
 
                 // Enter systolic and diastolic values
                 IWebElement SystolicElement = driver.FindElement(By.Id("BP_Systolic"));
-                SystolicElement.SendKeys("110");  // Ideal BP systolic value (adjusted for "Ideal" test)
+                SystolicElement.Clear(); // Clear existing value
+                SystolicElement.SendKeys("110");  // Ideal BP systolic value
 
                 IWebElement DiastolicElement = driver.FindElement(By.Id("BP_Diastolic"));
-                DiastolicElement.SendKeys("75");  // Ideal BP diastolic value (adjusted for "Ideal" test)
+                DiastolicElement.Clear(); // Clear existing value
+                DiastolicElement.SendKeys("75");  // Ideal BP diastolic value
 
                 // Submit the form
-                driver.FindElement(By.CssSelector(".btn")).Submit();
+                driver.FindElement(By.CssSelector(".btn.btn-default")).Click();
 
                 // Explicitly wait for the result
                 IWebElement BPValueElement = new WebDriverWait(driver, TimeSpan.FromSeconds(10))
                     .Until(c => c.FindElement(By.CssSelector("#form1 > div:nth-child(4) > input")));
 
                 // Get the value attribute instead of text
-                string bpResult = BPValueElement.GetAttribute("value");
+                string bpResult = BPValueElement.Text.ToString();
 
                 // Validate the result
-                StringAssert.EndsWith(bpResult, "Ideal");  // Since the input value is "Ideal"
+                StringAssert.EndsWith(bpResult, "Ideal");
 
                 driver.Quit();
 
