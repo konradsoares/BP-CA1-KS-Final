@@ -46,7 +46,7 @@ namespace SeleniumTest
             // read URL from SeleniumTest.runsettings (configure run settings)
             //this.webAppUri = testContextInstance.Properties["webAppUri"].ToString();
 
-            this.webAppUri = "https://bp-ca1-ks-final-canary-ghhhbkfpbwa4cxgd.francecentral-01.azurewebsites.net/";
+            this.webAppUri = "https://bp-ca1-ks-final-dev-efbdh3a8hfgufufu.germanywestcentral-01.azurewebsites.net/";
         }
 
         [TestMethod]
