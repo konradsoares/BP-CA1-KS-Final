@@ -45,7 +45,7 @@ namespace SeleniumTest
                 DiastolicElement.SendKeys("75");  // Ideal BP diastolic value
 
                 // Submit the form
-                driver.FindElement(By.class("btn btn-default")).Submit();
+                driver.FindElement(By.CssSelector(".btn.btn-default")).Click();
 
                 // Explicitly wait for the result
                 IWebElement BPValueElement = new WebDriverWait(driver, TimeSpan.FromSeconds(10))
