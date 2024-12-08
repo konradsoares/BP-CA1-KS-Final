@@ -76,7 +76,7 @@ namespace SeleniumTest
                     .Until(c => c.FindElement(By.CssSelector("#form1 > div:nth-child(4) > input")));
 
                 // Get the value attribute instead of text
-                string bpResult = BPValueElement.Text.ToString();
+                string bpResult = BPValueElement.value();
 
                 // Validate the result
                 StringAssert.EndsWith(bpResult, "Ideal");
