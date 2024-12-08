@@ -73,11 +73,10 @@ namespace SeleniumTest
 
                 // Explicitly wait for the result
                 IWebElement BPValueElement = new WebDriverWait(driver, TimeSpan.FromSeconds(10))
-                    .Until(c => c.FindElement(By.CssSelector("#form1 > div:nth-child(4) > input")));
+                    .Until(c => c.FindElement(By.ClassName("form-control bg-green valid")));
 
                 // Get the value attribute instead of text
-                string bpResult = BPValueElement.Text.ToString();
-
+                string bpResult = BPValueElement.GetAttribute("value");
                 // Validate the result
                 StringAssert.EndsWith(bpResult, "Ideal");
 
@@ -88,3 +87,4 @@ namespace SeleniumTest
         }
     }
 }
+<input type="text" value="Ideal" class="form-control bg-green valid" readonly="" aria-invalid="false">
