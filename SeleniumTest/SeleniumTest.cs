@@ -22,7 +22,7 @@ namespace SeleniumTest
         [TestInitialize]
         public void Setup()
         {
-            this.webAppUri = "https://bp-ca1-ks-finalendpoint-epfhcxa8f7brb2fn.z01.azurefd.net/";
+            this.webAppUri = "https://bp-ca1-ks-final-bkgechh5cegcffd9.germanywestcentral-01.azurewebsites.net/";
         }
 
         [TestMethod]
@@ -45,14 +45,14 @@ namespace SeleniumTest
                 DiastolicElement.SendKeys("75");  // Ideal BP diastolic value
 
                 // Submit the form
-                driver.FindElement(By.CssSelector(".btn")).Submit();
+                driver.FindElement(By.CssSelector(".btn.btn-default")).Click();
 
                 // Explicitly wait for the result
                 IWebElement BPValueElement = new WebDriverWait(driver, TimeSpan.FromSeconds(10))
                     .Until(c => c.FindElement(By.CssSelector("#form1 > div:nth-child(4)")));
 
                 // Get the value attribute instead of text
-                string bpResult = BPValueElement.GetAttribute("value");
+                string bpResult = BPValueElement.Text.ToString();
 
                 // Validate the result
                 StringAssert.EndsWith(bpResult, "Ideal Blood Pressure");
